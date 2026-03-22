@@ -337,7 +337,6 @@
   .cdot:nth-child(odd)  { background: var(--ink); }
   .cdot:nth-child(even) { background: rgba(0,0,0,0.55); }
   .cdot-label { font-size: 11px; color: rgba(10,10,30,.5); font-weight: 300; margin-left: 3px; }
-  .ticket-qr-row { grid-column: 1/-1; display: flex; align-items: center; gap: 14px; padding-top: 14px; margin-top: 2px; border-top: 1px dashed rgba(0,0,0,.12); }
   .tid strong { display: block; font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: rgba(10,10,30,.35); margin-bottom: 4px; }
   .tid span { font-size: 10px; color: rgba(10,10,30,.45); letter-spacing: 1px; word-break: break-all; }
   .ticket-strip { height: 5px; display: flex; }
@@ -523,13 +522,6 @@
             <span class="cdot-label" data-i18n="ticketDrinks">consumicions</span>
           </div>
         </div>
-
-        <div class="ticket-qr-row">
-          <canvas id="qrCanvas" width="72" height="72"></canvas>
-          <div class="tid">
-            <strong data-i18n="ticketCode">Codi d'entrada</strong>
-            <span id="ticketCode">—</span>
-          </div>
         </div>
       </div>
 
@@ -744,26 +736,8 @@
   }
 
   // ══════════════════════════════════════
-  //  QR & CONFETTI
+  //  CONFETTI
   // ══════════════════════════════════════
-  function drawFakeQR(canvas, seed) {
-    const ctx = canvas.getContext('2d'), s = canvas.width;
-    ctx.fillStyle = '#F8F6F2'; ctx.fillRect(0,0,s,s);
-    const cells = 9, cell = s/cells;
-    const rng = n => { let x = Math.sin(n+seed)*10000; return x-Math.floor(x); };
-    [[0,0],[0,6],[6,0]].forEach(([r,c]) => {
-      ctx.fillStyle='#1A1A1A'; ctx.fillRect(c*cell,r*cell,3*cell,3*cell);
-      ctx.fillStyle='#F8F6F2'; ctx.fillRect((c+.5)*cell,(r+.5)*cell,2*cell,2*cell);
-      ctx.fillStyle='#1A1A1A'; ctx.fillRect((c+1)*cell,(r+1)*cell,cell,cell);
-    });
-    for (let r=0;r<cells;r++) for (let c=0;c<cells;c++) {
-      if ((r<3&&c<3)||(r<3&&c>5)||(r>5&&c<3)) continue;
-      if (rng(r*cells+c)>.45) {
-        ctx.fillStyle = rng(r*cells+c+100)>.5 ? '#1A1A1A' : '#444';
-        ctx.fillRect(c*cell+1,r*cell+1,cell-2,cell-2);
-      }
-    }
-  }
 
   function fireConfetti() {
     const colors = ['#1A1A1A','#444','#888','#F8F6F2','#fff','#bbb'];
@@ -798,7 +772,6 @@
     const code = 'SET-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-'+Date.now().toString(36).substr(-4).toUpperCase();
     document.getElementById('ticketName').textContent = name;
     document.getElementById('ticketCode').textContent = code;
-    drawFakeQR(document.getElementById('qrCanvas'), name.length*137+code.charCodeAt(4));
     document.getElementById('ticketWrap').classList.add('visible');
     document.getElementById('actionsWrap').classList.add('visible');
     document.getElementById('nameSection').style.display = 'none';
@@ -820,8 +793,7 @@
       `SUMMARY:${t.calSummary}`,
       `DESCRIPTION:${t.calDesc(name)}`,
       'LOCATION:Calle Aribau 132\, Barcelona',
-      'END:VEVENT','END:VCALENDAR'].join('
-');
+      'END:VEVENT','END:VCALENDAR'].join('\r\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));
     a.download = 'bindaia-tardeo-2026.ics';
