@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Ticket</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    .ticket { display: none; border: 1px solid #ccc; padding: 20px; margin-top: 20px; }
+    .error { color: red; display: none; }
+    .visible { display: block; }
+    button { padding: 10px 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>Generador de Ticket</h1>
+
+  <input type="text" id="nameInput" placeholder="Introduce tu nombre"><br><br>
+
+  <label>
+    <input type="checkbox" id="consentCheckbox"> Acepto el consentimiento
+  </label>
+  <div id="consentError" class="error">Debes aceptar el consentimiento</div>
+
+  <br><br>
+
+  <button id="generateBtn">Generar Ticket</button>
+
+  <div id="ticket" class="ticket">
+    <h2>Ticket generado</h2>
+    <p><strong>Nombre:</strong> <span id="ticketName"></span></p>
+    <p><strong>Código:</strong> <span id="ticketCode"></span></p>
+  </div>
+
+  <script>
+    function generateCode() {
+      return Math.random().toString(36).substring(2, 10).toUpperCase();
+    }
+
+    function generateTicket() {
+      const nameInput = document.getElementById('nameInput');
+      const consent = document.getElementById('consentCheckbox');
+      const consentError = document.getElementById('consentError');
+      const ticket = document.getElementById('ticket');
+
+      const name = nameInput.value.trim();
+
+      // Reset error
+      consentError.classList.remove('visible');
+
+      if (!name) {
+        alert('Por favor, introduce tu nombre');
+        nameInput.focus();
+        return;
+      }
+
+      if (!consent.checked) {
+        consentError.classList.add('visible');
+        return;
+      }
+
+      const code = generateCode();
+
+      document.getElementById('ticketName').textContent = name;
+      document.getElementById('ticketCode').textContent = code;
+
+      ticket.style.display = 'block';
+    }
+
+    // Evento moderno (mejor que onclick)
+    document.getElementById('generateBtn').addEventListener('click', generateTicket);
+  </script>
+
+</body>
+</html>
